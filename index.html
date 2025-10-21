@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker - Pantau Suasana Hati Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .mood-card {
+            transition: all 0.3s ease;
+        }
+        
+        .mood-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 font-sans">
+    <div class="min-h-full">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-4 py-6">
+                <div class="text-center">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">🌈 Mood Tracker</h1>
+                    <p class="text-gray-600">Pantau suasana hati Anda dan dapatkan saran aktivitas positif</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 py-8">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="text-center fade-in">
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="text-6xl mb-4 pulse-animation">😊</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang di Mood Tracker!</h2>
+                    <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+                        Aplikasi ini akan membantu Anda memahami suasana hati saat ini melalui kuis sederhana, 
+                        kemudian memberikan saran aktivitas yang tepat untuk meningkatkan mood Anda.
+                    </p>
+                    <button onclick="startQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105">
+                        Mulai Kuis Mood 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quizScreen" class="hidden">
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-lg p-4 mb-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-600">Progress</span>
+                        <span class="text-sm font-medium text-gray-600" id="progressText">1/5</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progressBar" class="progress-bar bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-6 fade-in">
+                    <div class="text-center mb-6">
+                        <div class="text-4xl mb-4" id="questionEmoji">🤔</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4" id="questionText">Loading...</h3>
+                    </div>
+                    
+                    <div class="space-y-3" id="answersContainer">
+                        <!-- Answers will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-8 text-center fade-in">
+                    <div class="text-6xl mb-4" id="resultEmoji">😊</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4" id="resultTitle">Hasil Mood Anda</h2>
+                    <p class="text-gray-600 mb-6" id="resultDescription">Deskripsi mood...</p>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">🎯 Saran Aktivitas untuk Anda:</h3>
+                        <div class="grid md:grid-cols-2 gap-4" id="activitiesContainer">
+                            <!-- Activities will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-full font-semibold hover:from-purple-600 hover:to-blue-600 transition-all duration-300">
+                            Ulangi Kuis 🔄
+                        </button>
+                        <button onclick="saveResult()" class="bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition-all duration-300">
+                            Simpan Hasil 💾
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mood History -->
+                <div id="historySection" class="mt-8 bg-white rounded-2xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📊 Riwayat Mood Anda</h3>
+                    <div id="historyContainer" class="space-y-3">
+                        <!-- History will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-12">
+            <div class="max-w-4xl mx-auto px-4 py-6 text-center">
+                <p class="text-gray-500 text-sm">
+                    💡 <strong>Tips:</strong> Gunakan aplikasi ini secara rutin untuk memahami pola mood Anda dan meningkatkan kesejahteraan mental.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Quiz data
+        const questions = [
+            {
+                emoji: "😴",
+                text: "Bagaimana tingkat energi Anda hari ini?",
+                answers: [
+                    { text: "Sangat berenergi dan bersemangat", score: { happy: 3, energetic: 3 } },
+                    { text: "Cukup berenergi untuk aktivitas normal", score: { happy: 2, calm: 2 } },
+                    { text: "Agak lelah tapi masih bisa beraktivitas", score: { tired: 2, calm: 1 } },
+                    { text: "Sangat lelah dan tidak berenergi", score: { tired: 3, sad: 1 } }
+                ]
+            },
+            {
+                emoji: "💭",
+                text: "Bagaimana perasaan Anda tentang hari ini?",
+                answers: [
+                    { text: "Sangat positif dan optimis", score: { happy: 3, energetic: 2 } },
+                    { text: "Cukup baik dan stabil", score: { happy: 2, calm: 2 } },
+                    { text: "Biasa saja, tidak terlalu baik atau buruk", score: { calm: 2, tired: 1 } },
+                    { text: "Agak negatif dan pesimis", score: { sad: 2, anxious: 1 } },
+                    { text: "Sangat buruk dan down", score: { sad: 3, tired: 2 } }
+                ]
+            },
+            {
+                emoji: "👥",
+                text: "Bagaimana keinginan Anda untuk berinteraksi sosial?",
+                answers: [
+                    { text: "Sangat ingin bertemu dan berbicara dengan orang", score: { happy: 2, energetic: 3 } },
+                    { text: "Ingin bersosialisasi dengan teman dekat", score: { happy: 2, calm: 1 } },
+                    { text: "Lebih suka sendiri tapi tidak keberatan jika ada yang datang", score: { calm: 3, tired: 1 } },
+                    { text: "Ingin menyendiri dan menghindari orang lain", score: { sad: 2, anxious: 2 } }
+                ]
+            },
+            {
+                emoji: "🎯",
+                text: "Seberapa mudah Anda berkonsentrasi hari ini?",
+                answers: [
+                    { text: "Sangat fokus dan produktif", score: { happy: 2, energetic: 2 } },
+                    { text: "Cukup fokus untuk menyelesaikan tugas", score: { calm: 3, happy: 1 } },
+                    { text: "Sulit fokus, mudah teralihkan", score: { anxious: 2, tired: 2 } },
+                    { text: "Tidak bisa fokus sama sekali", score: { anxious: 3, sad: 1 } }
+                ]
+            },
+            {
+                emoji: "🌙",
+                text: "Bagaimana kualitas tidur Anda semalam?",
+                answers: [
+                    { text: "Tidur nyenyak dan bangun segar", score: { happy: 2, energetic: 3 } },
+                    { text: "Tidur cukup baik", score: { calm: 2, happy: 1 } },
+                    { text: "Tidur kurang nyenyak", score: { tired: 2, anxious: 1 } },
+                    { text: "Susah tidur atau sering terbangun", score: { tired: 3, anxious: 2 } },
+                    { text: "Tidak tidur atau insomnia", score: { anxious: 3, tired: 3 } }
+                ]
+            }
+        ];
+
+        const moodTypes = {
+            happy: {
+                name: "Bahagia & Positif",
+                emoji: "😊",
+                description: "Anda sedang dalam mood yang baik! Energi positif Anda terpancar dan ini adalah waktu yang tepat untuk menikmati hidup.",
+                activities: [
+                    "🎵 Dengarkan musik favorit dan bernyanyi",
+                    "📞 Hubungi teman atau keluarga untuk berbagi kebahagiaan",
+                    "🎨 Lakukan aktivitas kreatif seperti menggambar atau menulis",
+                    "🚶‍♀️ Jalan-jalan di taman atau tempat yang Anda sukai",
+                    "📚 Baca buku yang menginspirasi",
+                    "🍳 Masak makanan favorit untuk diri sendiri atau orang lain"
+                ]
+            },
+            energetic: {
+                name: "Energik & Bersemangat",
+                emoji: "⚡",
+                description: "Anda penuh energi dan siap menghadapi tantangan! Manfaatkan energi ini untuk hal-hal produktif.",
+                activities: [
+                    "🏃‍♀️ Olahraga atau aktivitas fisik yang intens",
+                    "🧹 Bersih-bersih rumah atau organisir ruangan",
+                    "📋 Selesaikan proyek atau tugas yang tertunda",
+                    "🎯 Mulai hobi baru atau keterampilan baru",
+                    "👥 Ajak teman untuk aktivitas outdoor",
+                    "💪 Tantang diri dengan workout atau permainan"
+                ]
+            },
+            calm: {
+                name: "Tenang & Damai",
+                emoji: "😌",
+                description: "Anda dalam keadaan tenang dan seimbang. Ini adalah waktu yang baik untuk refleksi dan aktivitas yang menenangkan.",
+                activities: [
+                    "🧘‍♀️ Meditasi atau latihan pernapasan",
+                    "🛁 Mandi air hangat dengan aromaterapi",
+                    "🌱 Merawat tanaman atau berkebun",
+                    "☕ Minum teh hangat sambil menikmati pemandangan",
+                    "📖 Baca buku dengan santai",
+                    "🎨 Melukis atau mewarnai dengan tenang"
+                ]
+            },
+            tired: {
+                name: "Lelah & Butuh Istirahat",
+                emoji: "😴",
+                description: "Tubuh dan pikiran Anda membutuhkan istirahat. Berikan waktu untuk pemulihan dan jangan terlalu memaksakan diri.",
+                activities: [
+                    "💤 Tidur siang atau istirahat yang cukup",
+                    "🛋️ Berbaring sambil mendengarkan musik santai",
+                    "🍵 Minum minuman hangat yang menenangkan",
+                    "📺 Nonton film atau series yang ringan",
+                    "🛁 Berendam air hangat untuk relaksasi",
+                    "📱 Batasi aktivitas yang menguras energi"
+                ]
+            },
+            sad: {
+                name: "Sedih & Membutuhkan Dukungan",
+                emoji: "😢",
+                description: "Anda sedang merasa down. Ingatlah bahwa perasaan ini normal dan akan berlalu. Berikan waktu untuk diri sendiri.",
+                activities: [
+                    "💬 Berbicara dengan teman dekat atau keluarga",
+                    "📝 Tulis jurnal tentang perasaan Anda",
+                    "🎵 Dengarkan musik yang menenangkan",
+                    "🤗 Peluk boneka atau hewan peliharaan",
+                    "🍫 Nikmati makanan comfort food favorit",
+                    "🌅 Duduk di tempat yang tenang dan nikmati alam"
+                ]
+            },
+            anxious: {
+                name: "Cemas & Gelisah",
+                emoji: "😰",
+                description: "Anda sedang merasa cemas. Fokus pada teknik menenangkan diri dan jangan ragu untuk mencari dukungan jika diperlukan.",
+                activities: [
+                    "🫁 Latihan pernapasan dalam (4-7-8)",
+                    "🧘‍♀️ Meditasi mindfulness selama 10 menit",
+                    "📝 Tulis daftar hal-hal yang Anda syukuri",
+                    "🚶‍♀️ Jalan kaki pelan di lingkungan yang aman",
+                    "🎵 Dengarkan musik klasik atau suara alam",
+                    "☎️ Hubungi konselor atau teman yang dipercaya"
+                ]
+            }
+        };
+
+        let currentQuestion = 0;
+        let scores = { happy: 0, energetic: 0, calm: 0, tired: 0, sad: 0, anxious: 0 };
+        let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+
+        function startQuiz() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            currentQuestion = 0;
+            scores = { happy: 0, energetic: 0, calm: 0, tired: 0, sad: 0, anxious: 0 };
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('questionEmoji').textContent = question.emoji;
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('progressText').textContent = `${currentQuestion + 1}/${questions.length}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+
+            const container = document.getElementById('answersContainer');
+            container.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'mood-card w-full p-4 text-left bg-gray-50 hover:bg-purple-50 rounded-lg border border-gray-200 hover:border-purple-300 transition-all duration-300';
+                button.textContent = answer.text;
+                button.onclick = () => selectAnswer(index);
+                container.appendChild(button);
+            });
+        }
+
+        function selectAnswer(answerIndex) {
+            const answer = questions[currentQuestion].answers[answerIndex];
+            
+            // Add scores
+            Object.keys(answer.score).forEach(mood => {
+                scores[mood] += answer.score[mood];
+            });
+
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                setTimeout(() => {
+                    showQuestion();
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    showResults();
+                }, 300);
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            // Determine dominant mood
+            let dominantMood = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const moodData = moodTypes[dominantMood];
+
+            document.getElementById('resultEmoji').textContent = moodData.emoji;
+            document.getElementById('resultTitle').textContent = moodData.name;
+            document.getElementById('resultDescription').textContent = moodData.description;
+
+            // Show activities
+            const activitiesContainer = document.getElementById('activitiesContainer');
+            activitiesContainer.innerHTML = '';
+            
+            moodData.activities.forEach(activity => {
+                const activityDiv = document.createElement('div');
+                activityDiv.className = 'bg-white p-3 rounded-lg shadow-sm border border-gray-100';
+                activityDiv.textContent = activity;
+                activitiesContainer.appendChild(activityDiv);
+            });
+
+            // Show history
+            displayHistory();
+        }
+
+        function saveResult() {
+            const dominantMood = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const result = {
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                mood: moodTypes[dominantMood].name,
+                emoji: moodTypes[dominantMood].emoji
+            };
+
+            moodHistory.unshift(result);
+            if (moodHistory.length > 10) moodHistory.pop(); // Keep only last 10 entries
+            
+            localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+            displayHistory();
+
+            // Show success message
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✅ Tersimpan!';
+            button.disabled = true;
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function displayHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (moodHistory.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">Belum ada riwayat mood. Simpan hasil kuis untuk melihat riwayat.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            moodHistory.forEach(entry => {
+                const historyDiv = document.createElement('div');
+                historyDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                historyDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${entry.emoji}</span>
+                        <div>
+                            <div class="font-medium text-gray-800">${entry.mood}</div>
+                            <div class="text-sm text-gray-500">${entry.date} • ${entry.time}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(historyDiv);
+            });
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+        }
+
+        // Initialize history on page load
+        window.onload = function() {
+            displayHistory();
+        };
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'991d93ae503e3e44',t:'MTc2MTAxNjM4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
